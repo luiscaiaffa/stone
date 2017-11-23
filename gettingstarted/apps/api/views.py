@@ -1,11 +1,13 @@
 from decimal import Decimal
+from rest_condition import Or
 from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.views import Response
 from rest_framework import generics, filters, pagination
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, TokenHasScope, OAuth2Authentication
 
 from gettingstarted.apps.wallet.models import CreditCard, Wallet, Invoice
@@ -45,7 +47,7 @@ class CreditCardList(CustomList,generics.ListCreateAPIView):
     serializer_class = CreditCardSerializer
     ordering = 'id'
     authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    permission_classes = [TokenHasReadWriteScope]
+    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
     def get_queryset(self):
         user = self.request.user
@@ -59,7 +61,7 @@ class CreditCardDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CreditCard.objects.all()
     serializer_class = CreditCardSerializer
     authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    permission_classes = [TokenHasReadWriteScope]
+    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -79,7 +81,7 @@ class WalletList(CustomList,generics.ListCreateAPIView):
     serializer_class = WalletSerializer
     ordering = 'id'
     authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    permission_classes = [TokenHasReadWriteScope]
+    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
     def get_queryset(self):
         user = self.request.user
@@ -93,7 +95,7 @@ class WalletDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Wallet.objects.all()
     serializer_class = WalletUpdateSerializer
     authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    permission_classes = [TokenHasReadWriteScope]
+    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 # End Wallet
 
 
@@ -125,7 +127,8 @@ class InvoiceList(CustomList,generics.ListCreateAPIView):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     ordering = 'id'
-    
+    authentication_classes = [OAuth2Authentication, SessionAuthentication]
+    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -137,6 +140,8 @@ class InvoiceList(CustomList,generics.ListCreateAPIView):
 
 
 class InvoiceDetail(APIView):
+    authentication_classes = [OAuth2Authentication, SessionAuthentication]
+    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
     
     def get_object(self, pk):
         try:
