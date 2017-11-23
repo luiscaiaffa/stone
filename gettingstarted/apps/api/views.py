@@ -107,22 +107,23 @@ def filter_wallet(day, price, user, instance):
     cards = wallet.cards.all().filter(due_date__gte=day, invoice=0).order_by('-due_date', 'credit_limit')
     if not cards:
         cards = wallet.cards.all().filter(due_date__lt=day, invoice=0).order_by('-due_date', 'credit_limit')
-    wallet.credit = wallet.credit - price
-    wallet.save()
-    for card in cards:
-        if card.balance >= price:
-            value  = card.balance - price
-            card.balance = value
-            card.invoice = price
-            card.save()
-            instance.cards.add(card)
-            break
-        else:
-            price = price - card.balance
-            card.invoice = card.balance
-            card.balance = 0
-            card.save()
-            instance.cards.add(card)
+    if cards:
+        wallet.credit = wallet.credit - price
+        wallet.save()
+        for card in cards:
+            if card.balance >= price:
+                value  = card.balance - price
+                card.balance = value
+                card.invoice = price
+                card.save()
+                instance.cards.add(card)
+                break
+            else:
+                price = price - card.balance
+                card.invoice = card.balance
+                card.balance = 0
+                card.save()
+                instance.cards.add(card)
     
 
 class InvoiceList(CustomList,generics.ListCreateAPIView):

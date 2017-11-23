@@ -1,5 +1,6 @@
 from decimal import Decimal
 from datetime import datetime
+from django.db.models import Sum
 from rest_framework import serializers
 
 from gettingstarted.apps.wallet.models import CreditCard, Wallet, Invoice
@@ -92,6 +93,13 @@ class WalletUpdateSerializer(DynamicFieldsModelSerializer):
 
 # Invoice
 class InvoiceSerializer(DynamicFieldsModelSerializer):
+
+    def validate(self, data):
+        credit = Wallet.objects.get(user=self.context['request'].user).credit
+        if credit < data['price']:
+            raise serializers.ValidationError("Price greater than the credit")
+        
+        return data
 
     class Meta:
         model = Invoice
