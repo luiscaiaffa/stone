@@ -104,7 +104,9 @@ def filter_wallet(day, price, user, instance):
     value = Decimal(0.00)
     price = Decimal(price)
     wallet = Wallet.objects.get(user=user)
-    cards = wallet.cards.all().filter(due_date__gt=day, invoice=0).order_by('-due_date', 'credit_limit')
+    cards = wallet.cards.all().filter(due_date__gte=day, invoice=0).order_by('-due_date', 'credit_limit')
+    if not cards:
+        cards = wallet.cards.all().filter(due_date__lt=day, invoice=0).order_by('-due_date', 'credit_limit')
     wallet.credit = wallet.credit - price
     wallet.save()
     for card in cards:
