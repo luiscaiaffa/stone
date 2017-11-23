@@ -14,6 +14,8 @@ $ python manage.py migrate
 $ python manage.py createsuperuser
 
 $ python manage.py runserver
+
+$ python manage.py test gettingstarted/apps/api/
 ```
 
 Seu aplicativo agora deve estar rodando em [localhost:8000](http://localhost:8000/).
