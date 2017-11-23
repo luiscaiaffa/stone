@@ -23,7 +23,8 @@ class CreditCard(models.Model):
         validators= [MaxValueValidator(12), MinValueValidator(1)]
     )
     exp_year = models.IntegerField(
-        help_text='Format YY (EX: 17, 21)'
+        help_text='Format YY (EX: 17, 21)',
+        validators= [MaxValueValidator(99), MinValueValidator(1)]
     )
     due_date = models.IntegerField(
         help_text='Format DD (EX: 01, 31)',

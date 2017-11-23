@@ -1,4 +1,5 @@
 from decimal import Decimal
+from datetime import datetime
 from rest_framework import serializers
 
 from gettingstarted.apps.wallet.models import CreditCard, Wallet, Invoice
@@ -28,6 +29,14 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class CreditCardSerializer(DynamicFieldsModelSerializer):
 
     def validate(self, data):
+        date = datetime.now()
+        year = int(str(date.year)[2:])
+        month = date.month  
+
+        if int(data['exp_year']) < year:
+            raise serializers.ValidationError("exp_year < year now")
+        if int(data['exp_month']) < month and int(data['exp_year']) == year:
+            raise serializers.ValidationError("exp_month < month now")
         if self.instance:
             if Wallet.objects.filter(cards=self.instance.pk):
                 raise serializers.ValidationError("To edit a card, please remove it from the wallet!")
