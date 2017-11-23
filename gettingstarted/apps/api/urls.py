@@ -10,5 +10,5 @@ urlpatterns = [
     url(r'^wallet/(?P<pk>[0-9]+)$', views.WalletDetail.as_view(), name='wallet-detail'),
     # Invoice
     url(r'^invoice/$', views.InvoiceList.as_view(), name='invoice'),
-    url(r'^invoice/(?P<pk>[0-9]+)$', views.InvoiceDetail.as_view(), name='invoice-detail'),
+    url(r'^invoice/(?P<pk>[0-9]+)/pay/$', views.InvoiceDetail.as_view(), name='invoice-detail'),
 ]
